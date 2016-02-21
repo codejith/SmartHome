@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SmartHome</string>
+    <string name="lgt1">Light 1</string>
+    <string name="lgt2">Light 2</string>
+</resources>
