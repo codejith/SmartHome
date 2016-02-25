@@ -235,7 +235,7 @@ public class MQTTservice extends Service
 		private class MsgHandler extends Handler implements MqttCallback
 		{
 		   // private final String HOST = "iot.eclipse.org";
-		    private final String HOST = "192.168.2.14";
+		    private final String HOST = "192.168.2.17";
 		    private final int PORT = 1883;
 		    private final String uri = "tcp://" + HOST +":" + PORT;
 			private final int MINTIMEOUT = 2000;

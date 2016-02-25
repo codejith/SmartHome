@@ -17,8 +17,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         startService(new Intent(this, MQTTservice.class));
         System.out.println("WORKING TILL");
+
         buttonListener();
     }
 
@@ -75,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
         {
            // String topic = i.getStringExtra(MQTTservice.TOPIC);
             String message = i.getStringExtra(MQTTservice.MESSAGE);
-            Toast.makeText(context, "Push message received - " + "Light" + ":" + message, Toast.LENGTH_LONG).show();
+            //System.out.println(message);
+            Toast.makeText(context, "Push message received - " + "Temperature" + ":" + message, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -97,9 +101,10 @@ public class MainActivity extends AppCompatActivity {
             msg.replyTo = serviceHandler;
             try
             {
+                Thread.sleep(100);
                 service.send(msg);
             }
-            catch (RemoteException e)
+            catch (RemoteException | InterruptedException e)
             {
                 e.printStackTrace();
             }
@@ -132,48 +137,84 @@ public class MainActivity extends AppCompatActivity {
 
  public void buttonListener() {
 
-     Button lgt1 = (Button)findViewById(R.id.light1);
-     Button lgt2 = (Button)findViewById(R.id.light2);
-     lgt1.setOnClickListener(new View.OnClickListener() {
+    // Button lgt1 = (Button)findViewById(R.id.light1);
+      Button temp = (Button)findViewById(R.id.light2);
+
+     ToggleButton tg = (ToggleButton)findViewById(R.id.light1);
+
+     tg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+         @Override
+         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+             if (isChecked) {
+                 Bundle data = new Bundle();
+                 //data.putCharSequence(MQTTservice.TOPIC, "Light");
+                 data.putCharSequence(MQTTservice.TOPIC, "Light2");
+                 data.putCharSequence(MQTTservice.MESSAGE, "a");
+                 Message msg = Message.obtain(null, MQTTservice.PUBLISH);
+                 msg.setData(data);
+                 msg.replyTo = serviceHandler;
+                 try {
+                     service.send(msg);
+                 } catch (RemoteException e) {
+                     e.printStackTrace();
+
+                 }
+             } else {
+                 Bundle data = new Bundle();
+                 data.putCharSequence(MQTTservice.TOPIC, "Light2");
+                 data.putCharSequence(MQTTservice.MESSAGE, "b");
+                 Message msg = Message.obtain(null, MQTTservice.PUBLISH);
+                 msg.setData(data);
+                 msg.replyTo = serviceHandler;
+                 try {
+                     service.send(msg);
+                 } catch (RemoteException e) {
+                     e.printStackTrace();
+                 }
+             }
+         }
+     });
+
+
+     temp.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
              Bundle data = new Bundle();
-             data.putCharSequence(MQTTservice.TOPIC, "Light");
+             //data.putCharSequence(MQTTservice.TOPIC, "Light");
+             data.putCharSequence(MQTTservice.TOPIC, "tempTopic");
+
              Message msg = Message.obtain(null, MQTTservice.SUBSCRIBE);
              msg.setData(data);
              msg.replyTo = serviceHandler;
              try {
                  service.send(msg);
-             }
-             catch (RemoteException e) {
-                 e.printStackTrace();
-                // result.setText("Subscribe failed with exception:" + e.getMessage());
+             } catch (RemoteException e) {
+               //  Toast.makeText(context, "No data available", Toast.LENGTH_LONG).show();
+                  e.printStackTrace();
+                 // result.setText("Subscribe failed with exception:" + e.getMessage());
              }
 
          }
      });
 
-     lgt2.setOnClickListener(new View.OnClickListener() {
+     /*lgt2.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View v) {
 
              Bundle data = new Bundle();
              data.putCharSequence(MQTTservice.TOPIC, "Light2");
-             data.putCharSequence(MQTTservice.MESSAGE,"light 1 ON");
+             data.putCharSequence(MQTTservice.MESSAGE, "b");
              Message msg = Message.obtain(null, MQTTservice.PUBLISH);
              msg.setData(data);
              msg.replyTo = serviceHandler;
-             try
-             {
+             try {
                  service.send(msg);
-             }
-             catch (RemoteException e)
-             {
+             } catch (RemoteException e) {
                  e.printStackTrace();
                  //.setText("Publish failed with exception:" + e.getMessage());
              }
          }
-     });
+     });*/
  }
 
 
